@@ -298,7 +298,7 @@ def load_dataloaders(args):
         model = args.model_size #'albert-base-v2'
         lower_case = True
         model_name = 'ALBERT'
-    elif args.model_no == 3:
+    elif args.model_no == 2:
         from transformers import AutoTokenizer as Tokenizer
 
         # tokenizer = AutoTokenizer.from_pretrained('allenai/scibert_scivocab_uncased')

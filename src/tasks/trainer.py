@@ -57,7 +57,8 @@ def train_and_fit(args):
                                 task='classification' if args.task != 'fewrel' else 'fewrel',\
                                 n_classes_=args.num_classes)
     
-    #tokenizer = load_pickle("%s_tokenizer.pkl" % model_name)
+    if model_name == 'ALBERT' or model_name == 'BERT':
+        tokenizer = load_pickle("%s_tokenizer.pkl" % model_name)
     net.resize_token_embeddings(len(tokenizer)) 
     if cuda:
         net.cuda()

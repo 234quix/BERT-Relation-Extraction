@@ -8,15 +8,46 @@ Created on Mon Dec  2 17:40:16 2019
 from src.tasks.trainer import train_and_fit
 from src.tasks.infer import infer_from_trained, FewRel
 import logging
+# from absl import logging
+
 from argparse import ArgumentParser
+import pdb
+import sh
+
 
 '''
 This fine-tunes the BERT model on SemEval task 
 '''
+# logger = logging.getLogger('simple_example')
+# logger.setLevel(logging.INFO)
+# # create file handler which logs even debug messages
+# fh = logging.FileHandler('spam.log')
+# fh.setLevel(logging.INFO)
+# # create console handler with a higher log level
+# ch = logging.StreamHandler()
+# ch.setLevel(logging.INFO)
+# # create formatter and add it to the handlers
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# ch.setFormatter(formatter)
+# fh.setFormatter(formatter)
+# # add the handlers to logger
+# logger.addHandler(ch)
+# logger.addHandler(fh)
 
-logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', \
-                    datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
-logger = logging.getLogger('__file__')
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                               level=logging.INFO,
+                               handlers=[logging.FileHandler("{0}".format('mylogfile'), mode='a'),logging.StreamHandler()])
+
+logger = logging.getLogger('__name__')
+
+
+# logger.info('hello') 
+# exit(1)
+# import IPython ; IPython.embed() ; exit(1)
+
+# logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', \
+                    # datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+# logger = logging.getLogger('__file__')
 
 if __name__ == "__main__":
     parser = ArgumentParser()
