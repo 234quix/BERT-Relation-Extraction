@@ -43,18 +43,22 @@ def train_and_fit(args):
         model = args.model_size #'albert-base-v2'
         lower_case = True
         model_name = 'ALBERT'
+    elif args.model_no == 3:
+        from transformers import AutoTokenizer, AutoModel
+
+        tokenizer = AutoTokenizer.from_pretrained('allenai/scibert_scivocab_uncased')
+        Model = AutoModel.from_pretrained('allenai/scibert_scivocab_uncased')
+        model = 'allenai/scibert_scivocab_uncased' # args.model_size #'albert-base-v2'
+        lower_case = True
+        model_name = 'SciBert'
     
     net = Model.from_pretrained(model, force_download=False, \
                                 model_size=args.model_size,
                                 task='classification' if args.task != 'fewrel' else 'fewrel',\
                                 n_classes_=args.num_classes)
     
-    tokenizer = load_pickle("%s_tokenizer.pkl" % model_name)
-    net.resize_token_embeddings(len(tokenizer))
-    e1_id = tokenizer.convert_tokens_to_ids('[E1]')
-    e2_id = tokenizer.convert_tokens_to_ids('[E2]')
-    assert e1_id != e2_id != 1
-    
+    #tokenizer = load_pickle("%s_tokenizer.pkl" % model_name)
+    net.resize_token_embeddings(len(tokenizer)) 
     if cuda:
         net.cuda()
         

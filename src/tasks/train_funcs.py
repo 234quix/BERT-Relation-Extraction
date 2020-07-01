@@ -29,7 +29,7 @@ def load_state(net, optimizer, scheduler, args, load_best=False):
         checkpoint = torch.load(best_path)
         logger.info("Loaded best model.")
     elif os.path.isfile(checkpoint_path):
-        checkpoint = torch.load(checkpoint_path)
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
         logger.info("Loaded checkpoint model.")
     if checkpoint != None:
         start_epoch = checkpoint['epoch']

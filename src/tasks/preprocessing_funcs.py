@@ -298,13 +298,21 @@ def load_dataloaders(args):
         model = args.model_size #'albert-base-v2'
         lower_case = True
         model_name = 'ALBERT'
+    elif args.model_no == 3:
+        from transformers import AutoTokenizer as Tokenizer
+
+        # tokenizer = AutoTokenizer.from_pretrained('allenai/scibert_scivocab_uncased')
+        # Model = AutoModel.from_pretrained('allenai/scibert_scivocab_uncased')
+        model = 'allenai/scibert_scivocab_uncased' # args.model_size  # 'albert-base-v2'
+        lower_case = True
+        model_name = 'SCIBERT'
         
     if os.path.isfile("./data/%s_tokenizer.pkl" % model_name):
         tokenizer = load_pickle("%s_tokenizer.pkl" % model_name)
         logger.info("Loaded tokenizer from pre-trained blanks model")
     else:
         logger.info("Pre-trained blanks tokenizer not found, initializing new tokenizer...")
-        tokenizer = Tokenizer.from_pretrained(model, do_lower_case=False)
+        tokenizer = Tokenizer.from_pretrained(model, do_lower_case=lower_case)
         tokenizer.add_tokens(['[E1]', '[/E1]', '[E2]', '[/E2]', '[BLANK]'])
 
         save_as_pickle("%s_tokenizer.pkl" % model_name, tokenizer)
@@ -312,11 +320,32 @@ def load_dataloaders(args):
     
     e1_id = tokenizer.convert_tokens_to_ids('[E1]')
     e2_id = tokenizer.convert_tokens_to_ids('[E2]')
-    assert e1_id != e2_id != 1
     
     if args.task == 'semeval':
         relations_path = './data/relations.pkl'
         train_path = './data/df_train.pkl'
+        test_path = './data/df_test.pkl'
+        if os.path.isfile(relations_path) and os.path.isfile(train_path) and os.path.isfile(test_path):
+            rm = load_pickle('relations.pkl')
+            df_train = load_pickle('df_train.pkl')
+            df_test = load_pickle('df_test.pkl')
+            logger.info("Loaded preproccessed data.")
+        else:
+            df_train, df_test, rm = preprocess_semeval2010_8(args)
+        
+        train_set = semeval_dataset(df_train, tokenizer=tokenizer, e1_id=e1_id, e2_id=e2_id)
+        test_set = semeval_dataset(df_test, tokenizer=tokenizer, e1_id=e1_id, e2_id=e2_id)
+        train_length = len(train_set); test_length = len(test_set)
+        PS = Pad_Sequence(seq_pad_value=tokenizer.pad_token_id,\
+                          label_pad_value=tokenizer.pad_token_id,\
+                          label2_pad_value=-1)
+        train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, \
+                                  num_workers=0, collate_fn=PS, pin_memory=False)
+        test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=True, \
+                                  num_workers=0, collate_fn=PS, pin_memory=False)
+    elif args.task == 'semeval_debug':
+        relations_path = './data/relations.pkl'
+        train_path = './data/df_train_debug.pkl'
         test_path = './data/df_test.pkl'
         if os.path.isfile(relations_path) and os.path.isfile(train_path) and os.path.isfile(test_path):
             rm = load_pickle('relations.pkl')
